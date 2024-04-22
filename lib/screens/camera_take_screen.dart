@@ -1,12 +1,12 @@
+import 'dart:async';
 import 'dart:io';
-import 'dart:math';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:ocr_app/models/record_element.dart';
 import 'package:ocr_app/provider/record_provider.dart';
+import 'package:ocr_app/service/chat_service.dart';
 import 'package:provider/provider.dart';
 
 class CameraTakeScreen extends StatefulWidget {
@@ -16,44 +16,135 @@ class CameraTakeScreen extends StatefulWidget {
   State<CameraTakeScreen> createState() => _CameraTakeScreenState();
 }
 
-class _CameraTakeScreenState extends State<CameraTakeScreen> {
+class _CameraTakeScreenState extends State<CameraTakeScreen>
+    with SingleTickerProviderStateMixin {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
-    // Get a specific camera from the list of available cameras.
     _cameraController = CameraController(
         const CameraDescription(
             name: '0',
-            lensDirection: CameraLensDirection.back,
+            lensDirection: CameraLensDirection.front,
             sensorOrientation: 1),
         ResolutionPreset.medium);
     _initializeControllerFuture = _cameraController.initialize();
 
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.1, end: 1).animate(_controller);
+
+    Future.delayed(
+      const Duration(seconds: 3),
+      () async {
+        await takePicture();
+        Navigator.popUntil(context, ModalRoute.withName('/'));
+      },
+    );
     super.initState();
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (value > 0) {
+          value--;
+        } else {
+          _timer.cancel();
+        }
+      });
+    });
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     _cameraController.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
+  late XFile image;
+
+  bool isDoingOperation = false;
+  int value = 4;
+  late Timer _timer;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: SizedBox.expand(
         child: FutureBuilder(
           future: _initializeControllerFuture,
           builder: (ctx, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              return Column(
+              return Stack(
+                alignment: Alignment.center,
                 children: [
-                  CameraPreview(_cameraController),
-                  ElevatedButton(
-                    onPressed: () async => await takePicture(),
-                    child: const Text('Take Picture'),
+                  SizedBox.expand(child: CameraPreview(_cameraController)),
+
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 500),
+                    opacity: isDoingOperation ? 1.0 : 0.0,
+                    child: Container(
+                      color: Colors.white,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
+                  // Circular Progress Indicator
+                  Visibility(
+                    visible: isDoingOperation,
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text('Chargement des informations')
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async => takePicture(),
+                    child: Center(
+                      child: AnimatedBuilder(
+                        animation: _animation,
+                        builder: (context, child) {
+                          return Container(
+                            height: 250,
+                            width: 300,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(_animation
+                                    .value), // Varying opacity for the glow effect
+                                width: _animation.value * 3 + 2,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 100,
+                    child: Text(
+                      value.toString(),
+                      style: const TextStyle(color: Colors.white, fontSize: 40),
+                    ),
+                  ),
+                  const Center(
+                    child: Text(
+                      'Veuillez placer la carte Ici',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                      ),
+                    ),
                   ),
                 ],
               );
@@ -70,17 +161,20 @@ class _CameraTakeScreenState extends State<CameraTakeScreen> {
 
   Future<void> takePicture() async {
     try {
-      final image = await _cameraController.takePicture();
+      image = await _cameraController.takePicture();
 
-      var text = await extractText(File(image.path));
-      text = cropText(text);
+      setState(() {
+        isDoingOperation = true;
+      });
+      final data = await AzureOCR.recognizeText(image.path);
 
       // Add the record to the provider.
       context.read<RecordProvider>().addRecord(
             RecordElement(
-              name: text,
+              name: data['Nom'] ?? '',
               imagePath: image.path,
               date: DateTime.now(),
+              data: data,
             ),
           );
 
@@ -92,17 +186,21 @@ class _CameraTakeScreenState extends State<CameraTakeScreen> {
           backgroundColor: Colors.green,
           textColor: Colors.white,
           fontSize: 16.0);
-      Navigator.pop(context);
+
       // If the picture was taken, display it on a new screen.
     } catch (e) {
       Fluttertoast.showToast(
-          msg: "Un erreue s'est produite",
+          msg: e.toString(),
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+    } finally {
+      setState(() {
+        isDoingOperation = false;
+      });
     }
   }
 
