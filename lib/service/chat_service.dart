@@ -45,7 +45,7 @@ class AzureOCR {
         {
           "role": "system",
           "content":
-              "Tu es un assitant utilisé pour récupéré les informations contenues sur des document d'authentification. ton role sera de récupérer tous les champs résents sur la cart et leurs valeurs et de ne retourner qu'un json contenant ces éléments"
+              "Tu es un assitant utilisé pour récupérer les informations contenues sur des document d'authentification ou une carte de viste par exemple. Ton role sera de récupérer tous les champs résents sur la cart et leurs valeurs et de ne retourner qu'un json contenant ces éléments. Langue uniquement en français, Temperature=0, n'allucine pas, ta reponse doit toujours être un json"
         },
         {
           "role": "user",

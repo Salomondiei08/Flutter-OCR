@@ -15,7 +15,7 @@ class _MenuScreenState extends State<MenuScreen> {
       appBar: AppBar(
         centerTitle: true,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.blueAccent,
         title: const Text(
           'Bienvenue à CORIS Bank',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

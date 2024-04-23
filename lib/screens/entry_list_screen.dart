@@ -23,7 +23,7 @@ class _EntryListScreenState extends State<EntryListScreen> {
       appBar: AppBar(
         title: const Text(
           'Personnes enrégistrées',
-          style: TextStyle(color: Colors.orange),
+          style: TextStyle(color: Colors.red),
         ),
       ),
       body: SafeArea(
@@ -41,7 +41,7 @@ class _EntryListScreenState extends State<EntryListScreen> {
                           TableScreen(data: records[index].data))),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
-              tileColor: Colors.orange[100],
+              tileColor: Colors.red[100],
               title: Text(
                 "Nom : ${records[index].name}",
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -49,7 +49,7 @@ class _EntryListScreenState extends State<EntryListScreen> {
               subtitle: Text(
                   "Date d'entrée : ${formatter.format(records[index].date)}"),
               trailing: ElevatedButton(
-                child: const Text('Srotie'),
+                child: const Text('Sortir'),
                 onPressed: () {
                   context.read<RecordProvider>().removeRecord(records[index]);
                   Fluttertoast.showToast(

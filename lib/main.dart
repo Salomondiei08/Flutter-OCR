@@ -16,7 +16,7 @@ class OCRApp extends StatelessWidget {
       create: (context) => RecordProvider(),
       child: MaterialApp(
         theme: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(primary: Colors.orange),
+          colorScheme: const ColorScheme.light(primary: Colors.red),
         ),
         debugShowCheckedModeBanner: false,
         title: 'CORIS Bank',
