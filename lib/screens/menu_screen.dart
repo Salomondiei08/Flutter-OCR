@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ocr_app/screens/camera_take_screen.dart';
+import 'package:ocr_app/screens/contact_list.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -15,7 +15,7 @@ class _MenuScreenState extends State<MenuScreen> {
       appBar: AppBar(
         centerTitle: true,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color(0xff00539f),
         title: const Text(
           'Bienvenue à CORIS Bank',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -26,7 +26,7 @@ class _MenuScreenState extends State<MenuScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
           child: GridView(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, mainAxisSpacing: 10, childAspectRatio: 0.8),
+                crossAxisCount: 2, mainAxisSpacing: 10, childAspectRatio: 1),
             children: const [
               MenuWidget(
                 text: 'J\'ai un Rendez-vous',
@@ -61,37 +61,45 @@ class MenuWidget extends StatelessWidget {
 
   final String imageUrl;
   final String text;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (ctx) => const CameraTakeScreen(),
+          builder: (ctx) => ContactListScreen(
+            text: text,
+          ),
         ),
       ),
       child: Card(
-        child: Column(
-          children: [
-            Container(
-              height: 100,
-              width: 100,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.contain,
-                  image: AssetImage(imageUrl),
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.contain,
+                    image: AssetImage(imageUrl),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              text,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            )
-          ],
+              const SizedBox(
+                height: 10,
+              ),
+              Text(
+                text,
+                textAlign: TextAlign.center,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              )
+            ],
+          ),
         ),
       ),
     );

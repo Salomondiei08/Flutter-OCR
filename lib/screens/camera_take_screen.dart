@@ -10,7 +10,10 @@ import 'package:ocr_app/service/chat_service.dart';
 import 'package:provider/provider.dart';
 
 class CameraTakeScreen extends StatefulWidget {
-  const CameraTakeScreen({super.key});
+  const CameraTakeScreen(
+      {super.key, required this.name, required this.reeason});
+  final String name;
+  final String reeason;
 
   @override
   State<CameraTakeScreen> createState() => _CameraTakeScreenState();
@@ -39,6 +42,7 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
     )..repeat(reverse: true);
     _animation = Tween<double>(begin: 0.1, end: 1).animate(_controller);
 
+    super.initState();
     Future.delayed(
       const Duration(seconds: 3),
       () async {
@@ -46,8 +50,6 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
         Navigator.popUntil(context, ModalRoute.withName('/'));
       },
     );
-    super.initState();
-
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         if (value > 0) {
@@ -74,6 +76,7 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
   late Timer _timer;
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       body: SizedBox.expand(
         child: FutureBuilder(
@@ -108,26 +111,23 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
                       ],
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () async => takePicture(),
-                    child: Center(
-                      child: AnimatedBuilder(
-                        animation: _animation,
-                        builder: (context, child) {
-                          return Container(
-                            height: 250,
-                            width: 300,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(_animation
-                                    .value), // Varying opacity for the glow effect
-                                width: _animation.value * 3 + 2,
-                              ),
+                  Center(
+                    child: AnimatedBuilder(
+                      animation: _animation,
+                      builder: (context, child) {
+                        return Container(
+                          height: size.width * 0.8,
+                          width: size.width * 0.8,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(_animation
+                                  .value), // Varying opacity for the glow effect
+                              width: _animation.value * 3 + 2,
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                   Positioned(
@@ -171,6 +171,9 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
       // Add the record to the provider.
       context.read<RecordProvider>().addRecord(
             RecordElement(
+              vistedPerson: widget.name,
+              id: DateTime.now().toString(),
+              resaon: widget.reeason,
               name: data['Nom'] ?? '',
               imagePath: image.path,
               date: DateTime.now(),
@@ -194,7 +197,7 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xffe2001a),
           textColor: Colors.white,
           fontSize: 16.0);
     } finally {
