@@ -16,7 +16,6 @@ dependencies:
     sdk: flutter
   fluttertoast: ^8.2.5
   google_mlkit_text_recognition: ^0.12.1
-  hive_flutter: ^1.1.0
   http: ^1.2.1
   intl: ^0.19.0
   open_file_plus: ^3.4.1+1

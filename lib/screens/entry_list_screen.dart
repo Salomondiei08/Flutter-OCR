@@ -20,9 +20,6 @@ class EntryListScreen extends StatefulWidget {
 }
 
 class _EntryListScreenState extends State<EntryListScreen> {
-
-
-  
   final DateFormat formatter = DateFormat('MMMM d - hh:mm');
 
   @override
@@ -30,9 +27,11 @@ class _EntryListScreenState extends State<EntryListScreen> {
     final records = context.watch<RecordProvider>().records;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xffe2001a),
+        centerTitle: true,
         title: const Text(
-          'Personnes enrégistrées',
-          style: TextStyle(color: Color(0xffe2001a)),
+          'Personnes enregistrées',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -73,40 +72,40 @@ class _EntryListScreenState extends State<EntryListScreen> {
               : ListView.builder(
                   itemCount: records.length,
                   itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (ctx) => TableScreen(
-                                data: records[index].data,
-                                id: records[index].id),
-                          ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 10),
+                    child: ListTile(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (ctx) => TableScreen(
+                              data: records[index].data, id: records[index].id),
                         ),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        tileColor: const Color(0xffe2001a).withOpacity(0.2),
-                        title: Text(
-                          "Nom : ${records[index].name}",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                            "Date d'entrée : ${formatter.format(records[index].date)}"),
-                        trailing: ElevatedButton(
-                          child: const Text('Sortir'),
-                          onPressed: () {
-                            context
-                                .read<RecordProvider>()
-                                .removeRecord(records[index]);
-                            Fluttertoast.showToast(
-                                msg: 'Merci d\'être passé chez nous !');
-                          },
-                        ),
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      tileColor: const Color(0xffe2001a).withOpacity(0.2),
+                      title: Text(
+                        "Nom : ${records[index].name}",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                          "Date d'entrée : ${formatter.format(records[index].date)}"),
+                      trailing: ElevatedButton(
+                        child: const Text('Sortir'),
+                        onPressed: () {
+                          context
+                              .read<RecordProvider>()
+                              .removeRecord(records[index]);
+                          Fluttertoast.showToast(
+                              msg: 'Merci d\'être passé chez nous !');
+                        },
                       ),
                     ),
                   ),
+             
+             
+             
                 )),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,

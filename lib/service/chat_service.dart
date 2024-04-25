@@ -60,7 +60,7 @@ class AzureOCR {
     );
 
     if (response.statusCode == 200) {
-      final result = json.decode(response.body);
+      final result = json.decode(utf8.decode((response.bodyBytes)));
       final chatResponse = result['choices'][0]['message']['content'];
       print(removeJsonTags(chatResponse));
       return jsonDecode(removeJsonTags(chatResponse));

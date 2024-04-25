@@ -169,6 +169,19 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
 
       var text = await extractText(File(image.path));
 
+      if (text.isEmpty) {
+        Navigator.pop(context);
+        Fluttertoast.showToast(
+            msg: "Text Ttop Flou ou non détecté !",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: const Color(0xffe2001a),
+            textColor: Colors.white,
+            fontSize: 16.0);
+        return;
+      }
+
       final data = await AzureOCR.recognizeText(text);
 
       // Add the record to the provider.
@@ -185,7 +198,7 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
           );
 
       Fluttertoast.showToast(
-          msg: "Enrégistrement ajouté",
+          msg: "Enregistrement ajouté",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 1,

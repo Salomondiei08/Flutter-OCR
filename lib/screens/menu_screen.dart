@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ocr_app/screens/camera_take_screen.dart';
 import 'package:ocr_app/screens/contact_list.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -15,7 +16,7 @@ class _MenuScreenState extends State<MenuScreen> {
       appBar: AppBar(
         centerTitle: true,
         automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xff00539f),
+        backgroundColor: const  Color(0xffe2001a),
         title: const Text(
           'Bienvenue à CORIS Bank',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -37,10 +38,12 @@ class _MenuScreenState extends State<MenuScreen> {
                 imageUrl: 'assets/images/check.png',
               ),
               MenuWidget(
+                isListNeeded: true,
                 text: 'Je suis employé',
                 imageUrl: 'assets/images/recruitment.png',
               ),
               MenuWidget(
+                isListNeeded: true,
                 text: 'Je suis prestataire',
                 imageUrl: 'assets/images/workers.png',
               ),
@@ -57,10 +60,12 @@ class MenuWidget extends StatelessWidget {
     super.key,
     required this.imageUrl,
     required this.text,
+    this.isListNeeded = false,
   });
 
   final String imageUrl;
   final String text;
+  final bool isListNeeded;
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +73,14 @@ class MenuWidget extends StatelessWidget {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (ctx) => ContactListScreen(
-            text: text,
-          ),
+          builder: (ctx) => isListNeeded
+              ? const CameraTakeScreen(
+                  name: '',
+                  reeason: '',
+                )
+              : ContactListScreen(
+                  text: text,
+                ),
         ),
       ),
       child: Card(
