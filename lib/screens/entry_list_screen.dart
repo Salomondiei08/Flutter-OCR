@@ -20,6 +20,9 @@ class EntryListScreen extends StatefulWidget {
 }
 
 class _EntryListScreenState extends State<EntryListScreen> {
+
+
+  
   final DateFormat formatter = DateFormat('MMMM d - hh:mm');
 
   @override
@@ -130,31 +133,49 @@ class _EntryListScreenState extends State<EntryListScreen> {
   }
 
   Future<void> exportExcelFile({required List<RecordElement> records}) async {
-    var excel = Excel.createExcel();
+    // Get the documents directory
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String filePath = '${documentsDirectory.path}/records.xlsx';
+    var file = File(filePath);
 
-    var sheetObject = excel['aujourdhui'];
+    Excel excel;
+    if (file.existsSync()) {
+      // If file exists, load it
+      List<int> bytes = file.readAsBytesSync();
+      excel = Excel.decodeBytes(bytes);
+    } else {
+      // If file doesn't exist, create a new Excel instance
+      excel = Excel.createExcel();
+    }
 
+    var today = DateTime.now();
+    var sheetName = 'Sheet_${today.year}-${today.month}-${today.day}';
+
+    if (excel.tables.keys.contains(sheetName)) {
+      // If sheet with today's date exists, remove it
+
+      excel.unLink(sheetName);
+    }
+
+    // Create new sheet with today's date as name
+    var sheetObject = excel[sheetName];
+
+    // Insert data into the sheet
     for (var record in records) {
       List<CellValue> dataList = [];
-
+      dataList.add(TextCellValue(record.date.toString()));
       dataList.add(TextCellValue(record.name));
       dataList.add(TextCellValue(record.resaon));
-      dataList.add(TextCellValue(record.date.toString()));
-
       record.data.forEach((key, value) {
-        dataList.add(TextCellValue(value));
+        dataList.add(TextCellValue(value.toString()));
       });
-
       sheetObject.insertRowIterables(dataList, sheetObject.maxRows);
     }
 
     var fileBytes = excel.save();
-    var directory = await getApplicationDocumentsDirectory();
+    // Save the Excel file
 
-    final File file = File('${directory.path}/record.xlsx')
-      ..createSync(recursive: true);
     file.writeAsBytesSync(fileBytes!);
-
-    OpenFile.open("${directory.path}/record.xlsx");
+    OpenFile.open("${documentsDirectory.path}/records.xlsx");
   }
 }

@@ -166,7 +166,10 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
       setState(() {
         isDoingOperation = true;
       });
-      final data = await AzureOCR.recognizeText(image.path);
+
+      var text = await extractText(File(image.path));
+
+      final data = await AzureOCR.recognizeText(text);
 
       // Add the record to the provider.
       context.read<RecordProvider>().addRecord(
@@ -197,7 +200,7 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 1,
-          backgroundColor: Color(0xffe2001a),
+          backgroundColor: const Color(0xffe2001a),
           textColor: Colors.white,
           fontSize: 16.0);
     } finally {
@@ -216,16 +219,5 @@ class _CameraTakeScreenState extends State<CameraTakeScreen>
     String text = recognizedText.text;
     textRecognizer.close();
     return text;
-  }
-
-  String cropText(String text) {
-    int startIndex = text.indexOf('nom(s)');
-    int endIndex = text.indexOf('Nom');
-
-    if (startIndex == -1 || endIndex == -1) {
-      return text;
-    }
-
-    return text.substring(startIndex + 6, endIndex).trim();
   }
 }

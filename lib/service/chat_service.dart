@@ -28,37 +28,25 @@ String encodeImage(String imagePath) {
 class AzureOCR {
   AzureOCR();
 
-  static Future<Map<String, dynamic>> recognizeText(String imagePath) async {
+  static Future<Map<String, dynamic>> recognizeText(String text) async {
     // Getting the base64 string
-    String base64Image = encodeImage(imagePath);
-
-    // Constructing the data URI
-    String dataUri = "data:image/jpeg;base64,$base64Image";
-
-    print(dataUri);
-
+    print(text);
     const url =
-        'https://ocrfuturafric.openai.azure.com/openai/deployments/ocr/chat/completions?api-version=2023-12-01-preview';
+        'https://ocrfuturafric.openai.azure.com/openai/deployments/ciprel/chat/completions?api-version=2024-02-15-preview';
 
     final body = {
       "messages": [
         {
           "role": "system",
           "content":
-              "Tu es un assitant utilisé pour récupérer les informations contenues sur des document d'authentification ou une carte de viste par exemple. Ton role sera de récupérer tous les champs résents sur la cart et leurs valeurs et de ne retourner qu'un json contenant ces éléments. Langue uniquement en français, Temperature=0, n'allucine pas, ta reponse doit toujours être un json"
+              "Tu es un assitant utilisé pour bien agencé les information recuiellies sur une piece d'identite, ta mission est de retourner à chque fois un json contentant chaque champs et sa valeur français, Temperature=0, n'allucine pas, ta reponse doit toujours être un json"
         },
-        {
-          "role": "user",
-          "content": [
-            {
-              "type": "image_url",
-              "image_url": {"url": dataUri}
-            }
-          ]
-        }
+        {"role": "user", "content": text}
       ],
-      "max_tokens": 4096
+      "temperature": 0,
+      "model": "gpt-3.5-turbo"
     };
+
     final headers = {
       'Content-Type': 'application/json',
       'api-key': 'accbad07ba1e4aff87d041289c15b24f',
@@ -77,7 +65,7 @@ class AzureOCR {
       print(removeJsonTags(chatResponse));
       return jsonDecode(removeJsonTags(chatResponse));
     } else {
-      throw Exception('Failed to recognize text. ${response.statusCode}');
+      throw Exception('${response.reasonPhrase} ${response.statusCode}');
     }
   }
 }
